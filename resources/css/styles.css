@@ -1,0 +1,164 @@
+@import 'tailwindcss';
+body {
+    background-color: #263228; /* Dark green background from image */
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.hide-scrollbar {
+  /* For Internet Explorer and Edge */
+  -ms-overflow-style: none;
+  /* For Firefox */
+  scrollbar-width: none;
+}
+
+/* For Chrome, Safari, and Opera (WebKit browsers) */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.md-dark:hover {
+    color: #ffffff; /* White icons for better contrast */
+}
+
+.md-dark {
+    color: #000000; /* Slightly lighter on hover */
+}
+
+.blur {
+    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.d9d9d9 {
+    background-color: #d9d9d9; /* Light gray background */
+}
+
+.content {
+    max-height: 90vh;
+}
+
+.card-top {
+    background-color: #8c8c8c;
+}
+
+.card-bottom {
+    background-color: #3d3d3d;
+    height: 60px;
+}
+
+.sidebar-panel {
+    background-color: #d9d9d9;
+    width: 280px;
+    height: fit-content;
+}
+
+.pill-input {
+    background-color: #ffffff;
+    height: 48px;
+    width: 100%;
+    border-radius: 9999px;
+}
+
+.pill-button {
+    background-color: #0e8eb5;
+    height: 48px;
+    width: 100%;
+    border-radius: 9999px;
+    transition: opacity 0.2s;
+}
+
+.pill-button:hover {
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.create-post {
+    /* These three lines handle the centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Dimensions matching your wireframe */
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.menu {
+    /* These three lines handle the centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Dimensions matching your wireframe */
+    width: 54px;
+    height: 54px;
+    background-color: #d9d9d9;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.menu.open-menu {
+    width: 54px;
+    height: auto;
+    border-radius: 12px;
+    align-items: stretch; /* Stretch items to full width when open */
+}
+
+.menu-item {
+    padding: 16px 16px;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+}
+
+.menu-item:hover {
+    background-color: #c0c0c0;
+}
+
+.delete-container {
+    /* These three lines handle the centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Dimensions matching your wireframe */
+    width: 54px;
+    height: 54px;
+    background-color: #d9d9d9;
+    border-radius: 12px;
+    cursor: pointer;
+
+    overflow: hidden;
+}
+
+.delete-button {
+    padding: 16px 16px;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+}
+
+.delete-container:hover {
+    background-color: #9e2929;
+}
+
+.delete-button:hover {
+    color: #d9d9d9;
+}
