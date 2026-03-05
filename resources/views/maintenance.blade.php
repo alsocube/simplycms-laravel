@@ -1,6 +1,6 @@
-<!-- @extends('template')
-@section('title', 'SimplyCMS - by Alsocube')
-@section('content') -->
+@extends('template')
+@section('title', 'Sedang Maintenance')
+@section('content')
 <div class="flex lg:flex-row gap-12 w-full max-w-6xl items-start justify-center m-10">
     <!-- Left Panel -->
     <div class="hidden lg:block">
@@ -17,37 +17,22 @@
     <!-- Middle Panel / Content and much more -->
     <div class="flex flex-col">
         <div class="content flex flex-col flex-1 overflow-hidden" id="contents">
-            @if ($errors->any())
-                <div id="alert" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm relative mb-4 max-w-full cursor-pointer" onclick="this.remove()">
-                    <strong class="font-bold">Error!</strong>
-                    <ul class="mt-2">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-            @if (session('success'))
-                <div id="alert" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-sm relative mb-4 cursor-pointer" onclick="this.remove()">
-                    <strong class="font-bold">Success!</strong>
-                    @if (Auth::check())
-                        <span class="block">{{ session('success') }} {{ Auth::user()->username }}</span>
-                    @endif
-                </div>
-            @endif
+            <div class="bg-red-400 m-5 p-5">
+                <h1 class="text-3xl font-bold text-white text-center">Website Sedang Maintenance (Database Limit)</h1>
+                <p class="text-white text-center"> Maklum database gratisan </p>
+            </div>
             <!-- grid posts -->
             <div class="overflow-y-auto hide-scrollbar rounded-3xl justify-center items-center">
-                @if (!Auth::check() || Auth::user()->access != "admin")
                 <div class="columns-1 sm:columns-1 lg:columns-2 gap-5 pr-5 pl-5 space-y-5">
-                    @foreach ($posts as $post)
+                    @foreach (range(1, 6) as $index)
                         <div class="break-inside-void rounded-3xl overflow-hidden shadow-lg flex flex-col bg-[#3d3d3d] hover:scale-105 transition ease-in-out duration-300 cursor-pointer">
                             <!-- Top Section with Full Image -->
-                            <div class="card-top relative bg-[#8c8c8c]">
+                            <div class="card-top relative bg-[#8c8c8c] w-[400px] h-[400px]">
                                 <!-- Image set to full width/height and object-cover -->
-                                <img src="{{ $post->file_path }}" class="w-full h-full object-cover" alt="Post Image" onclick="viewPost({{ $post->post_id }})">
+                                <img src="" class="w-[400px] h-[400px] object-cover" alt="Post Image">
                                 <!-- Delete Button positioned bottom-right -->
                                 @if (Auth::check() && Auth::user()->user_id == $post->user_id)
-                                <div class="delete-container absolute bottom-2 right-2 md-dark" onclick="deletePost({{ $post->post_id }})">
+                                <div class="delete-container absolute bottom-2 right-2 md-dark">
                                     <button class="cursor-pointer delete-button">
                                         <span class="material-icons">delete</span>
                                     </button>
@@ -56,35 +41,8 @@
                             </div>
 
                             <!-- Bottom Section for Title -->
-                            <div class="card-bottom flex justify-center items-center h-20 px-4" onclick="viewPost({{ $post->post_id }})">
-                                <h3 class="text-xl font-bold text-gray-200 truncate">{{ $post->title }}</h3>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="flex justify-center">
-                    <p class="text-gray-400 text-xl italic mt-5">end of posts</p>
-                </div>
-                @elseif (Auth::check() && Auth::user()->access == "admin")
-                <div class="columns-1 sm:columns-1 lg:columns-2 gap-5 pr-5 pl-5 space-y-5">
-                    @foreach ($posts as $post)
-                        <div class="break-inside-void rounded-3xl overflow-hidden shadow-lg flex flex-col bg-[#3d3d3d] hover:scale-105 transition ease-in-out duration-300 cursor-pointer">
-                            <!-- Top Section with Full Image -->
-                            <div class="card-top relative bg-[#8c8c8c]">
-                                <!-- Image set to full width/height and object-cover -->
-                                <img src="{{ $post->file_path }}" class="w-full h-full object-cover" alt="Post Image" onclick="viewPost({{ $post->post_id }})">
-
-                                <!-- Delete Button positioned bottom-right -->
-                                <div class="delete-container absolute bottom-2 right-2 md-dark" onclick="deletePost({{ $post->post_id }})">
-                                    <button class="cursor-pointer delete-button">
-                                        <span class="material-icons">delete</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Bottom Section for Title -->
                             <div class="card-bottom flex justify-center items-center h-20 px-4">
-                                <h3 class="text-xl font-bold text-gray-200 truncate">{{ $post->title }}</h3>
+                                <h3 class="text-xl font-bold text-gray-200 truncate">Title</h3>
                             </div>
                         </div>
                     @endforeach
@@ -92,7 +50,6 @@
                 <div class="flex justify-center">
                     <p class="text-gray-400 text-xl italic mt-5">end of posts</p>
                 </div>
-                @endif
             </div>
         </div>
         <!-- extrapanel -->

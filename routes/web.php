@@ -6,7 +6,7 @@ use App\Http\Controllers\cmsPostsController;
 use Illuminate\Support\Facades\Storage;
 
 // view
-Route::get('/', [cmsPostsController::class, 'getPosts']);
+Route::get('/', [cmsPostsController::class, 'home']);
 Route::post('/post/{id}', [cmsPostsController::class, 'getPostbyID']);
 
 // CRU no D - users

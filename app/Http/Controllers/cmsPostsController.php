@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Storage;
 
 class cmsPostsController extends Controller
 {
+    public function home(){
+        return view('maintenance');
+    }
     public function getPosts(Request $request)
     {
         $posts = cmsPostsModel::orderBy('created_at', 'desc')->get();
