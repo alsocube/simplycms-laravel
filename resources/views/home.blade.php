@@ -1,6 +1,6 @@
-<!-- @extends('template')
+@extends('template')
 @section('title', 'SimplyCMS - by Alsocube')
-@section('content') -->
+@section('content')
 <div class="flex lg:flex-row gap-12 w-full max-w-6xl items-start justify-center m-10">
     <!-- Left Panel -->
     <div class="hidden lg:block">
@@ -275,7 +275,7 @@
                 <h3 class="text-xs font-bold text-orange-400">this web is jerryrigged by Alsocube</h3>
                 <li class="list-none mt-5">
                     <script>
-                        const toDO = ['ratings','komen mungkin idk', 'list postingan', 'optimize size gambar', 'video upload'];
+                        const toDO = ['ratings','komen mungkin idk', 'list postingan', 'video upload'];
                         for (i = 0; i < toDO.length; i++) {
                             document.write(`
                                 <ol>${toDO[i]}</ol>

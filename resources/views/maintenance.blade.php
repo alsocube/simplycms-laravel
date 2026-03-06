@@ -1,6 +1,6 @@
-@extends('template')
+<!-- @extends('template')
 @section('title', 'Sedang Maintenance')
-@section('content')
+@section('content') -->
 <div class="flex lg:flex-row gap-12 w-full max-w-6xl items-start justify-center m-10">
     <!-- Left Panel -->
     <div class="hidden lg:block">
@@ -24,25 +24,24 @@
             <!-- grid posts -->
             <div class="overflow-y-auto hide-scrollbar rounded-3xl justify-center items-center">
                 <div class="columns-1 sm:columns-1 lg:columns-2 gap-5 pr-5 pl-5 space-y-5">
-                    @foreach (range(1, 6) as $index)
+                    @foreach ($posts as $post)
                         <div class="break-inside-void rounded-3xl overflow-hidden shadow-lg flex flex-col bg-[#3d3d3d] hover:scale-105 transition ease-in-out duration-300 cursor-pointer">
                             <!-- Top Section with Full Image -->
-                            <div class="card-top relative bg-[#8c8c8c] w-[400px] h-[400px]">
+                            <div class="card-top relative bg-[#8c8c8c]">
                                 <!-- Image set to full width/height and object-cover -->
-                                <img src="" class="w-[400px] h-[400px] object-cover" alt="Post Image">
+                                <img src="{{ $post->file_path }}" class="w-full h-full object-cover" alt="Post Image" onclick="viewPost({{ $post->post_id }})">
+
                                 <!-- Delete Button positioned bottom-right -->
-                                @if (Auth::check() && Auth::user()->user_id == $post->user_id)
-                                <div class="delete-container absolute bottom-2 right-2 md-dark">
+                                <div class="delete-container absolute bottom-2 right-2 md-dark" onclick="deletePost({{ $post->post_id }})">
                                     <button class="cursor-pointer delete-button">
                                         <span class="material-icons">delete</span>
                                     </button>
                                 </div>
-                                @endif
                             </div>
 
                             <!-- Bottom Section for Title -->
                             <div class="card-bottom flex justify-center items-center h-20 px-4">
-                                <h3 class="text-xl font-bold text-gray-200 truncate">Title</h3>
+                                <h3 class="text-xl font-bold text-gray-200 truncate">{{ $post->title }}</h3>
                             </div>
                         </div>
                     @endforeach

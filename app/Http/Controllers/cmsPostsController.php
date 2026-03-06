@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Models\cmsPostsModel;
-use Illuminate\Validation\Rules\File;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class cmsPostsController extends Controller
 {
@@ -28,37 +29,49 @@ class cmsPostsController extends Controller
 
     public function createPost(Request $request)
     {
+        // dd($request->all());
         $post = new cmsPostsModel();
         $post->user_id = Auth::check() ? Auth::id() : 1999;
         $post->display_name = $request->input('display_name');
         $post->title = $request->input('post_title');
         $post->contents = $request->input('post_contents');
 
-        if ($request->hasFile('post_file')) {
+        if ($request->hasFile('post_file') && $request->file('post_file')->isValid()) {
 
             $request->validate([
                 'post_file' => [
-                    File::types(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])
-                        ->max(4608)
+                    \Illuminate\Validation\Rules\File::types(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])
+                        ->max(46080)
                 ]
             ]);
 
+            $compressor = new ImageManager(new Driver());
             $file = $request->file('post_file');
+            $img = $compressor->read($file);
+            $img->scaleDown(width: 1920);
+            $compressedImg = $img->toJpeg(75);
 
             try {
-                $path = Storage::disk('supabase')->putFile('', $file);
-                $post->file_name = $path;
-                $post->file_path = "https://czvnfiithalbnojeucgz.supabase.co/storage/v1/object/public/posts/{$path}";
+                // 1. Generate a unique file name with a .jpg extension
+                $fileName = 'posts/' . Str::random(40) . '.jpg';
+
+                // 2. Use put() instead of putFile() and cast the image to a string
+                Storage::disk('r2')->put($fileName, (string) $compressedImg);
+
+                // 3. Save the exact generated string and URL
+                $post->file_name = $fileName;
+                $post->file_path = Storage::disk('r2')->url($fileName);
             } catch (\Exception $e) {
-                // This will now output the SPECIFIC error from Supabase
                 dd([
                     'Message' => $e->getMessage(),
-                    'Endpoint' => config('filesystems.disks.supabase.endpoint'),
-                    'Bucket' => config('filesystems.disks.supabase.bucket')
+                    'Endpoint' => config('filesystems.disks.r2.endpoint'),
+                    'Bucket' => config('filesystems.disks.r2.bucket')
                 ]);
             }
         }
+
         $post->save();
+
         return redirect('/')
             ->with('success', 'Post Created');
     }
@@ -67,7 +80,9 @@ class cmsPostsController extends Controller
     {
         $post = cmsPostsModel::where('post_id', $request->input('id'))->first();
         if ($post) {
-            Storage::disk('supabase')->delete($post->file_name);
+            if ($post->file_name) {
+                Storage::disk('r2')->delete($post->file_name);
+            }
             $post->delete();
         }
         return redirect('/')
