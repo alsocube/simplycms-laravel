@@ -137,6 +137,10 @@
                     <div id="createPostLoading" class="flex flex-col items-center gap-3 p-5 hidden">
                         <div class="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
                         <span class="text-gray-700 font-semibold">Creating Post...</span>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2 max-w-xs">
+                            <div id="compressionProgress" class="bg-orange-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <span id="progressText" class="text-xs text-gray-500">Preparing...</span>
                     </div>
                     <form id="postForm" method="POST" action="/create-post" enctype="multipart/form-data">
                         @csrf
@@ -397,19 +401,31 @@ const formPanel = document.getElementById('postForm');
 const fileInput = document.querySelector('#post_file');
 const loadingElement = document.getElementById('createPostLoading');
 const panel = document.getElementById('createPost');
+const progressBar = document.getElementById('compressionProgress');
+const progressText = document.getElementById('progressText');
 
 newPost.addEventListener('submit', async (event) => {
     event.preventDefault();
     loadingElement.classList.remove('hidden');
     panel.classList.add('pointer-events-none');
     formPanel.classList.add('hidden');
-    const formData = new FormData(form);
+    
+    if (progressBar) progressBar.style.width = '0%';
+    if (progressText) progressText.innerText = 'Starting compression...';
+
+    const formData = new FormData(newPost);
     if (fileInput && fileInput.files.length > 0) {
         const file = fileInput.files[0];
         const options = {
             maxSizeMB: 1,
             maxWidthOrHeight: 1920,
-            useWebWorker: true
+            useWebWorker: true,
+            onProgress: (percent) => {
+                if (progressBar) progressBar.style.width = percent + '%';
+                if (progressText) {
+                    progressText.innerText = percent < 100 ? `Compressing: ${percent}%` : 'Uploading to server...';
+                }
+            }
         };
         try {
             const finalFile = await imageCompression(file, options);

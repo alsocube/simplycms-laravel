@@ -90,6 +90,12 @@ function showPosts(offset = 0) {
     } else {
         table.classList.add('hidden');
     }
+
+    if (usersManagement.classList.contains('border-b-2')) {
+        usersManagement.classList.remove('border-b-2');
+        usersManagement.classList.remove('text-orange-400');
+        usersManagement.classList.add('text-gray-400');
+    }
     
     postManagement.classList.add('border-b-2');
     postManagement.classList.add('text-orange-400');
@@ -189,6 +195,12 @@ function showUsers(offset = 0) {
         table.classList.add('hidden');
     }
     
+    if (postManagement.classList.contains('border-b-2')) {
+        postManagement.classList.remove('border-b-2');
+        postManagement.classList.remove('text-orange-400');
+        postManagement.classList.add('text-gray-400');
+    }
+
     usersManagement.classList.add('border-b-2');
     usersManagement.classList.add('text-orange-400');
     usersManagement.classList.remove('text-gray-400');

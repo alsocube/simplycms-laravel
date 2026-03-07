@@ -21,12 +21,9 @@ class adminController extends Controller
             $apiToken = env('CLOUDFLARE_API_TOKEN');
             $url = "https://api.cloudflare.com/client/v4/accounts/{$accountId}/r2/buckets/{$bucketName}/usage";
 
-            // $postsJSON = Http::timeout(120)->get('https://www.simplycms.my.id/posts');
-
             $response = Http::withToken($apiToken)->get($url);
             $storageSize = 'Unknown';
             
-
             if ($response->successful()) {
                 $bytes = $response->json('result.payloadSize', 0);
                 $storageSize = $this->formatBytes($bytes);
