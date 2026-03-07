@@ -44,7 +44,7 @@ class cmsPostsController extends Controller
             $request->validate([
                 'post_file' => [
                     \Illuminate\Validation\Rules\File::types(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])
-                        ->max(10240)
+                        ->max(4096)
                 ]
             ]);
 
