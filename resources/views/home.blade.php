@@ -328,6 +328,7 @@ function viewPost(postId) {
     closeMenu();
     showPanel('fullPostView');
     
+    event.preventDefault();
     const loading = document.getElementById('postLoading');
     const contentArea = document.getElementById('postContentArea');
     loading.classList.remove('hidden');
