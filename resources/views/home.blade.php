@@ -129,7 +129,7 @@
             <div class="hidden" id="createPost">
                 <div class="rounded-3xl shadow-2xl d9d9d9 p-8 flex flex-col justify-center p-5">
                     <h3 class="text-2xl font-bold text-gray-800">Create New Post</h3>
-                    <form action="{{ url('/create-post') }}" class="space-y-4 mt-4"enctype="multipart/form-data"  method="POST">
+                    <form id="postForm" method="POST" action="/create-post" enctype="multipart/form-data">
                         @csrf
                         @if (Auth::check())
                             <label for="">Display Name</label>
@@ -143,7 +143,7 @@
                         <label for="">Content</label>
                         <textarea name="post_contents" placeholder="Content" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 mb-4 h-40"></textarea>
                         <label for="">Attach Image, Max 4.5MB</label>
-                        <input type="file" name="post_file" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 mb-4">
+                        <input id="post_file" type="file" name="post_file" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 mb-4">
                         <input type="submit" value="Create Post" class="w-full p-2 rounded-full bg-orange-400 text-gray-200 font-bold cursor-pointer hover:bg-green-800 transition duration-300">
                     </form>
                 </div>
@@ -383,6 +383,41 @@ function toggleCreatePost() {
         createPost.classList.add('hidden');
     }
 }
+const form = document.querySelector('#postForm');
+const fileInput = document.querySelector('#post_file');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    let finalFile = null;
+
+    if (fileInput && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+
+        const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true
+        };
+
+        try {
+            finalFile = await imageCompression(file, options);
+        } catch (err) {
+            console.error("Compression error:", err);
+        }
+    }
+
+    const formData = new FormData(form);
+
+    if (finalFile) {
+        formData.set('post_file', finalFile);
+    }
+
+    fetch('/create-post', {
+        method: 'POST',
+        body: formData
+    }).then(() => window.location.reload());
+});
 function toggleAltProfilePanel() {
     closeMenu();
     const profile = document.getElementById('altProfilePanel');

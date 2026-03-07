@@ -7,6 +7,7 @@ use App\Models\cmsPostsModel;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 
@@ -29,54 +30,56 @@ class cmsPostsController extends Controller
 
     public function createPost(Request $request)
     {
-        // dd($request->all());
-        // $request->validate([
-        //     'post_file' => 'file|image|max:10240'
-        // ]);
-        $post = new cmsPostsModel();
-        $post->user_id = Auth::check() ? Auth::id() : 1999;
-        $post->display_name = $request->input('display_name');
-        $post->title = $request->input('post_title');
-        $post->contents = $request->input('post_contents');
-
-        if ($request->hasFile('post_file') && $request->file('post_file')->isValid()) {
-
-            $request->validate([
-                'post_file' => [
-                    \Illuminate\Validation\Rules\File::types(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])
-                        ->max(4096)
-                ]
+        try {
+            $validator = Validator::make($request->all(), [
+                'display_name' => 'required|string|max:25',
+                'post_title' => 'required|string|max:255',
+                'post_file' => 'nullable|image|max:4096' // 4MB safe for serverless
+            ], [
+                'display_name.required' => 'Display Name is required',
+                'display_name.max' => 'Display Name must be less than 25 characters',
+                'post_title.required' => 'Title is required',
+                'post_title.max' => 'Title must be less than 255 characters',
+                'post_file.image' => 'Currently we only support img',
+                'post_file.max' => 'The image size must not exceed 4MB',
             ]);
 
-            $compressor = new ImageManager(new Driver());
-            $file = $request->file('post_file');
-            $img = $compressor->read($file);
-            $img->scaleDown(width: 1920);
-            $compressedImg = $img->toJpeg(75);
-
-            try {
-                // 1. Generate a unique file name with a .jpg extension
-                $fileName = 'posts/' . Str::random(40) . '.jpg';
-
-                // 2. Use put() instead of putFile() and cast the image to a string
-                Storage::disk('r2')->put($fileName, (string) $compressedImg);
-
-                // 3. Save the exact generated string and URL
-                $post->file_name = $fileName;
-                $post->file_path = Storage::disk('r2')->url($fileName);
-            } catch (\Exception $e) {
-                dd([
-                    'Message' => $e->getMessage(),
-                    'Endpoint' => config('filesystems.disks.r2.endpoint'),
-                    'Bucket' => config('filesystems.disks.r2.bucket')
-                ]);
+            if ($validator->fails()) {
+                return redirect('/')
+                    ->withErrors($validator)
+                    ->withInput();
+            } else {
+                $post = new cmsPostsModel();
+                $post->user_id = Auth::check() ? Auth::id() : 1999;
+                $post->display_name = $request->input('display_name');
+                $post->title = $request->input('post_title');
+                $post->contents = $request->input('post_contents');
+        
+                if ($request->hasFile('post_file')) {
+                    $file = $request->file('post_file');
+    
+                    $path = $file->storeAs(
+                        'posts',
+                        Str::random(40) . '.' . $file->extension(),
+                        'r2'
+                    );
+    
+                    $post->file_name = $path;
+                    $post->file_path = Storage::disk('r2')->url($path);
+                }
+        
+                $post->save();
+        
+                return redirect('/')
+                    ->with('success', 'Post Created');
             }
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
         }
-
-        $post->save();
-
-        return redirect('/')
-            ->with('success', 'Post Created');
     }
 
     public function deletePost(Request $request)
