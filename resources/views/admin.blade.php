@@ -220,6 +220,7 @@ function showUsers(offset = 0) {
         pagination.classList.remove('hidden');
         indexControl.classList.remove('hidden');
         pageIndex.classList.remove('hidden');
+        table.classList.remove('hidden');
         
         const currentOffset = parseInt(data.offset, 10);
         const currentPage = Math.floor(currentOffset / limit) + 1;
