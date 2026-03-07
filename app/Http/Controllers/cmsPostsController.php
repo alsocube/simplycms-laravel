@@ -54,22 +54,21 @@ class cmsPostsController extends Controller
                 $post->display_name = $request->input('display_name');
                 $post->title = $request->input('post_title');
                 $post->contents = $request->input('post_contents');
-        
+
                 if ($request->hasFile('post_file')) {
                     $file = $request->file('post_file');
-    
+
                     $path = $file->storeAs(
                         'posts',
                         Str::random(40) . '.' . $file->extension(),
                         'r2'
                     );
-    
+
                     $post->file_name = $path;
                     $post->file_path = Storage::disk('r2')->url($path);
                 }
-        
+
                 $post->save();
-        
                 return redirect('/')
                     ->with('success', 'Post Created');
             }
