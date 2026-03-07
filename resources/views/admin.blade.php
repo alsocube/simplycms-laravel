@@ -126,9 +126,10 @@ function showPosts(offset = 0) {
         indexControl.classList.remove('hidden');
         pageIndex.classList.remove('hidden');
         
-        // Explicitly parse the offset as an integer just to be extra safe
         const currentOffset = parseInt(data.offset, 10);
         const currentPage = Math.floor(currentOffset / limit) + 1;
+
+        table.innerHTML = '';
         
         pageIndex.innerHTML = `
             <span class="text-gray-400">Showing page ${currentPage}</span>
@@ -237,6 +238,8 @@ function showUsers(offset = 0) {
         const currentOffset = parseInt(data.offset, 10);
         const currentPage = Math.floor(currentOffset / limit) + 1;
         
+        table.innerHTML = '';
+
         pageIndex.innerHTML = `
             <span class="text-gray-400">Showing page ${currentPage}</span>
         `;
