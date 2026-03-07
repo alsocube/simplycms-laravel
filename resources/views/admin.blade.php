@@ -33,9 +33,9 @@
                 <button id="usersManagement" class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition" onclick="showUsers()">
                     User Management
                 </button>
-                <button id="r2Management" class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition" onclick="showR2Usage()">
+                <!-- <button id="r2Management" class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition" onclick="showR2Usage()">
                     R2 Usage
-                </button>
+                </button> -->
             </nav>
         </div>
         <!-- table content -->
@@ -120,7 +120,9 @@ function showPosts(offset = 0) {
     })
     .then(response => response.json())
     .then(data => {
-        table.classList.remove('hidden');
+        if (!table.classList.contains('hidden')) {
+            table.classList.remove('hidden');
+        }
         loading.classList.add('hidden');
         pagination.classList.remove('hidden');
         indexControl.classList.remove('hidden');
@@ -128,8 +130,6 @@ function showPosts(offset = 0) {
         
         const currentOffset = parseInt(data.offset, 10);
         const currentPage = Math.floor(currentOffset / limit) + 1;
-
-        table.innerHTML = '';
         
         pageIndex.innerHTML = `
             <span class="text-gray-400">Showing page ${currentPage}</span>
@@ -233,12 +233,12 @@ function showUsers(offset = 0) {
         pagination.classList.remove('hidden');
         indexControl.classList.remove('hidden');
         pageIndex.classList.remove('hidden');
-        table.classList.remove('hidden');
+        if (!table.classList.contains('hidden')) {
+            table.classList.remove('hidden');
+        }
         
         const currentOffset = parseInt(data.offset, 10);
         const currentPage = Math.floor(currentOffset / limit) + 1;
-        
-        table.innerHTML = '';
 
         pageIndex.innerHTML = `
             <span class="text-gray-400">Showing page ${currentPage}</span>
@@ -301,41 +301,45 @@ function showUsers(offset = 0) {
     });
 }
 
-function showR2Usage() {
-    if (typeof event !== 'undefined') {
-        event.preventDefault();
-    }
+// function showR2Usage() {
+//     if (typeof event !== 'undefined') {
+//         event.preventDefault();
+//     }
 
-    table.classList.add('hidden');
-    loading.classList.remove('hidden');
-    pagination.classList.add('hidden');
+//     table.classList.add('hidden');
+//     loading.classList.remove('hidden');
+//     pagination.classList.add('hidden');
 
-    [postManagement, usersManagement].forEach(el => {
-        el.classList.remove('border-b-2', 'text-orange-400');
-        el.classList.add('text-gray-400');
-    });
+//     [postManagement, usersManagement].forEach(el => {
+//         el.classList.remove('border-b-2', 'text-orange-400');
+//         el.classList.add('text-gray-400');
+//     });
 
-    r2Management.classList.add('border-b-2', 'text-orange-400');
-    r2Management.classList.remove('text-gray-400');
+//     r2Management.classList.add('border-b-2', 'text-orange-400');
+//     r2Management.classList.remove('text-gray-400');
 
-    fetch(`{{ url('/r2-usage') }}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        loading.classList.add('hidden');
-        table.classList.remove('hidden');
-        table.innerHTML = `
-            <h1 class="text-3xl text-gray-400">${Math.floor(data.payloadSize / 1024 / 1024)} MB</h1>
-            <h1 class="text-3xl text-gray-400">${data.objectCount - 1} Objects</h1>
-        `
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        loading.classList.add('hidden');
-    });
-}
+//     fetch(`{{ url('/r2-usage') }}`, {
+//         method: 'GET',
+//         headers: { 'Content-Type': 'application/json' }
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         loading.classList.add('hidden');
+//         tableHead.classList.remove('hidden');
+//         tableHead.innerHTML = `
+//             <tr class="bg-[#1d1d1d] text-gray-400 uppercase text-xs">
+//                 <th class="p-4">Payload</th>
+//                 <th class="p-4"></th>
+//             </tr>
+//         `;
+        
+//         tableBody.innerHTML = '';
+//     })
+//     .catch(error => {
+//         console.error('Error:', error);
+//         loading.classList.add('hidden');
+//     });
+// }
 function deletePost(postId) {
     if (!confirm('Are you sure you want to delete this post?')) return;
     const form = document.createElement('form');
