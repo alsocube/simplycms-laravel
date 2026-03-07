@@ -10,6 +10,7 @@ Route::get('/', [cmsPostsController::class, 'home']);
 Route::get('/posts', [cmsPostsController::class, 'getPosts']);
 Route::post('/post/{id}', [cmsPostsController::class, 'getPostbyID']);
 Route::get('/admin', [adminController::class, 'getAdmin']);
+Route::get('/r2-usage', [adminController::class, 'r2Usage']);
 
 // CRUD - users
 Route::get('/users', [cmsUserController::class, 'getAllUsers']);

@@ -21,21 +21,32 @@ class adminController extends Controller
             $apiToken = env('CLOUDFLARE_API_TOKEN');
             $url = "https://api.cloudflare.com/client/v4/accounts/{$accountId}/r2/buckets/{$bucketName}/usage";
 
-            $response = Http::withToken($apiToken)->get($url);
+            $r2Usage = Http::withToken($apiToken)->get($url);
             $storageSize = 'Unknown';
             
-            if ($response->successful()) {
-                $bytes = $response->json('result.payloadSize', 0);
+            if ($r2Usage->successful()) {
+                $bytes = $r2Usage->json('result.payloadSize', 0);
                 $storageSize = $this->formatBytes($bytes);
             }
             // dd([
-            //     'HTTP Status Code' => $response->status(),
-            //     'Raw Body' => $response->body(),
-            //     'Posts' => $postsJSON
+            //     // 'HTTP Status Code' => $response->status(),
+            //     'Raw Body' => $r2Usage->body(),
+            //     // 'Posts' => $postsJSON
             // ]);
             return view('admin', compact('posts', 'storageSize'));
         }
         return redirect('/')->withErrors('Unauthorized access.');
+    }
+
+    public function r2Usage() {
+        $accountId = env('CLOUDFLARE_ACCOUNT_ID');
+        $bucketName = env('CLOUDFLARE_R2_BUCKET');
+        $apiToken = env('CLOUDFLARE_API_TOKEN');
+        $url = "https://api.cloudflare.com/client/v4/accounts/{$accountId}/r2/buckets/{$bucketName}/usage";
+        $r2Usage = Http::withToken($apiToken)->get($url);
+        if ($r2Usage->successful()) {
+            return $r2Usage->json('result');
+        }
     }
 
     private function formatBytes($bytes, $precision = 2) 

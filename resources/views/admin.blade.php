@@ -33,8 +33,8 @@
                 <button id="usersManagement" class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition" onclick="showUsers()">
                     User Management
                 </button>
-                <button class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition">
-                    System Logs
+                <button id="r2Management" class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition" onclick="showR2Usage()">
+                    R2 Usage
                 </button>
             </nav>
         </div>
@@ -71,6 +71,7 @@
 <script>
 const postManagement = document.getElementById('postManagement');
 const usersManagement = document.getElementById('usersManagement');
+const r2Management = document.getElementById('r2Management');
 const table = document.getElementById('tableContent');
 const loading = document.getElementById('loading');
 const pageIndex = document.getElementById('pageIndex');
@@ -95,6 +96,12 @@ function showPosts(offset = 0) {
         usersManagement.classList.remove('border-b-2');
         usersManagement.classList.remove('text-orange-400');
         usersManagement.classList.add('text-gray-400');
+    }
+
+    if (r2Management.classList.contains('border-b-2')) {
+        r2Management.classList.remove('border-b-2');
+        r2Management.classList.remove('text-orange-400');
+        r2Management.classList.add('text-gray-400');
     }
     
     postManagement.classList.add('border-b-2');
@@ -183,7 +190,6 @@ function showPosts(offset = 0) {
         console.error('Error:', error);
     });
 }
-
 function showUsers(offset = 0) {
     if (typeof event !== 'undefined') {
         event.preventDefault();
@@ -199,6 +205,12 @@ function showUsers(offset = 0) {
         postManagement.classList.remove('border-b-2');
         postManagement.classList.remove('text-orange-400');
         postManagement.classList.add('text-gray-400');
+    }
+
+    if (r2Management.classList.contains('border-b-2')) {
+        r2Management.classList.remove('border-b-2');
+        r2Management.classList.remove('text-orange-400');
+        r2Management.classList.add('text-gray-400');
     }
 
     usersManagement.classList.add('border-b-2');
@@ -247,25 +259,31 @@ function showUsers(offset = 0) {
                 <th class="p-4">User ID</th>
                 <th class="p-4">Username</th>
                 <th class="p-4">Email</th>
+                <th class="p-4">Post Count</th>
+                <th class="p-4">Hashed Password</th>
                 <th class="p-4">Access</th>
-                <th class="p-4">Created At</th>
                 <th class="p-4 text-center">Actions</th>
             </tr>
         `;
         
         tableBody.innerHTML = '';
-        data.users.forEach((user) => {
+        data.users.forEach((user, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="p-4">${user.user_id}</td>
                 <td class="p-4">${user.username}</td>
                 <td class="p-4">${user.email}</td>
+                <td class="p-4">${user.remember_token != null ? "TRUE" : "FALSE"}</td>
+                <td class="p-4">
+                    <div class="max-w-[150px] h-[80px] overflow-y-auto whitespace-normal break-words">
+                        ${user.password}
+                    </div>
+                </td>
                 <td class="p-4">
                     <span class="px-2 py-1 rounded text-xs font-bold ${user.access === 'admin' ? 'bg-purple-600' : (user.access === 'user' ? 'bg-orange-400' : 'bg-gray-600')}">
                         ${user.access}
                     </span>
                 </td>
-                <td class="p-4">${new Date(user.created_at).toLocaleDateString()}</td>
                 <td class="p-4 text-center">
                     <button class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-1 px-3 rounded text-xs">
                         Edit
@@ -277,6 +295,42 @@ function showUsers(offset = 0) {
     })
     .catch(error => {
         console.error('Error:', error);
+    });
+}
+
+function showR2Usage() {
+    if (typeof event !== 'undefined') {
+        event.preventDefault();
+    }
+
+    table.classList.add('hidden');
+    loading.classList.remove('hidden');
+    pagination.classList.add('hidden');
+
+    [postManagement, usersManagement].forEach(el => {
+        el.classList.remove('border-b-2', 'text-orange-400');
+        el.classList.add('text-gray-400');
+    });
+
+    r2Management.classList.add('border-b-2', 'text-orange-400');
+    r2Management.classList.remove('text-gray-400');
+
+    fetch(`{{ url('/r2-usage') }}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        loading.classList.add('hidden');
+        table.classList.remove('hidden');
+        table.innerHTML = `
+            <h1 class="text-3xl text-gray-400">${Math.floor(data.payloadSize / 1024 / 1024)} MB</h1>
+            <h1 class="text-3xl text-gray-400">${data.objectCount - 1} Objects</h1>
+        `
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        loading.classList.add('hidden');
     });
 }
 function deletePost(postId) {
