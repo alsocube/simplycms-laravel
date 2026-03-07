@@ -30,6 +30,9 @@ class cmsPostsController extends Controller
     public function createPost(Request $request)
     {
         // dd($request->all());
+        $request->validate([
+            'post_file' => 'file|image|max:10240'
+        ]);
         $post = new cmsPostsModel();
         $post->user_id = Auth::check() ? Auth::id() : 1999;
         $post->display_name = $request->input('display_name');
@@ -38,12 +41,12 @@ class cmsPostsController extends Controller
 
         if ($request->hasFile('post_file') && $request->file('post_file')->isValid()) {
 
-            $request->validate([
-                'post_file' => [
-                    \Illuminate\Validation\Rules\File::types(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])
-                        ->max(46080)
-                ]
-            ]);
+            // $request->validate([
+            //     'post_file' => [
+            //         \Illuminate\Validation\Rules\File::types(['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])
+            //             ->max(10240)
+            //     ]
+            // ]);
 
             $compressor = new ImageManager(new Driver());
             $file = $request->file('post_file');
