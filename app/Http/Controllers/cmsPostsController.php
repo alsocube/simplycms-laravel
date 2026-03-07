@@ -13,15 +13,20 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 class cmsPostsController extends Controller
 {
-    public function home(){
-        return view('maintenance');
-    }
-    public function getPosts(Request $request)
-    {
+    public function home() {
         $posts = cmsPostsModel::orderBy('created_at', 'desc')->get();
         return view('home', compact('posts'));
     }
-
+    public function getPosts(Request $request)
+    {
+        $limit = (int) $request->input('limit', 5);
+        $offset = (int) $request->input('offset', 0);
+        $posts = cmsPostsModel::orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+        return response()->json(['posts' => $posts, 'offset' => $offset]);
+    }
     public function getPostbyID($id)
     {
         $post = cmsPostsModel::where('post_id', $id)->first();

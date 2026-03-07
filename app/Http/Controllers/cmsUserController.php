@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Auth;
 
 class cmsUserController extends Controller
 {
+    public function getAllUsers(Request $request)
+    {
+        $limit = (int) $request->input('limit', 5);
+        $offset = (int) $request->input('offset', 0);
+        $users = cmsUserModel::orderBy('user_id')
+            ->limit($limit)
+            ->offset($offset)
+            ->get();
+        return response()->json(["users" => $users, "offset" => $offset]);
+    }
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -84,5 +94,36 @@ class cmsUserController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/')->with('success', 'You Have Been Logged Out');
+    }
+
+    public function editProfile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'nullable|string|email|max:255|unique:cms_users',
+            'username' => 'nullable|string|max:255|unique:cms_users',
+            'password' => 'nullable|string|min:4|confirmed',
+        ],[
+            'email.email' => 'Email must be a valid email address.',
+            'email.unique' => 'Email already exists.',
+            'username.unique' => 'Username already exists.',
+            'password.min' => 'Password must be at least 4 characters.',
+            'password.confirmed' => 'Passwords do not match.'
+        ]);
+        if ($validator->fails()) {
+            return redirect('/')->withErrors($validator)->withInput();
+        }
+        $user = new cmsUserModel();
+        $user = cmsUserModel::where('user_id', Auth::user()->user_id)->first();
+        if ($user) {
+            $user->username = $request->input('username') ?: $user->username;
+            $user->email = $request->input('email') ?: $user->email;
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->input('password'));
+            }
+            $user->save();
+        } else {
+            return redirect('/')->withErrors('Data not found.');
+        }
+        return redirect('/')->with('success', 'Profile Updated');
     }
 }

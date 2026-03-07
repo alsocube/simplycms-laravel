@@ -106,7 +106,10 @@
                             <span>Close</span>
                         </div>
                     </div>
-                    <div id="postLoading" class="text-center py-10 text-gray-600">Loading...</div>
+                    <div id="postLoading" class="flex flex-col items-center gap-3 p-5">
+                        <div class="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-gray-700 font-semibold">Fetching Post...</span>
+                    </div>
                 </div>
                 <div id="postContentArea" class="hidden max-w-[666px] mx-auto flex flex-col justify-center items-center rounded-3xl shadow-2xl overflow-hidden bg-[#8c8c8c] relative">
                     <div class="absolute top-4 left-4 bg-orange-400 hover:bg-green-800 transition duration-300 rounded-full h-[35px] flex items-center justify-center p-2 cursor-pointer shadow-lg md-dark z-10" onclick="closePostView()">
@@ -191,7 +194,7 @@
                         <input type="email" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="email" name="email">
                         <input type="text" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="username" name="username">
                         <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="passsword" name="password">
-                        <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="retype passsword" name="confirm_password">
+                        <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="password_confirmation" name="confirm_password">
                         <input type="submit" value="Sign Up" class="w-full p-2 rounded-full bg-orange-400 text-gray-200 font-bold cursor-pointer hover:bg-green-800 transition duration-300">
                     </form>
                     <span class="hover:text-orange-400 text-green-800 transition duration-300 pointer" onclick="toggleAltForms()">Sign In</span>
@@ -199,15 +202,15 @@
                 @else
                 <div class="rounded-3xl shadow-2xl d9d9d9 p-8 flex flex-col justify-center p-5 mt-5">
                     <h3 class="text-2xl font-bold text-gray-800 mb-5">Edit Profile</h3>
-                    <form action="#" class="space-y-4">
+                    <form class="space-y-4" action="{{ url('/edit-profile') }}" method="POST">
                         @csrf
                         <label for="">Email</label>
-                        <input type="email" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="email" name="email" value="{{ Auth::user()->email }}">
+                        <input type="email" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="{{ Auth::user()->email }}" name="email">
                         <label for="">Username</label>
-                        <input type="text" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="username" name="username" value="{{ Auth::user()->username }}">
+                        <input type="text" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="{{ Auth::user()->username }}" name="username">
                         <label for="">Password</label>
-                        <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="new passsword" name="password">
-                        <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="retype new passsword" name="confirm_password">
+                        <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="passsword" name="password">
+                        <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="password_confirmation" name="password_confirmation">
                         <input type="submit" value="Edit Profile" class="w-full p-2 rounded-full bg-orange-400 text-gray-200 font-bold cursor-pointer hover:bg-green-800 transition duration-300">
                     </form>
                 </div>
@@ -259,7 +262,7 @@
                             <input type="email" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="email" name="email">
                             <input type="text" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="username" name="username">
                             <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="passsword" name="password">
-                            <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="retype passsword" name="password_confirmation">
+                            <input type="password" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="password_confirmation" name="password_confirmation">
                             <input type="submit" value="Sign Up" class="w-full p-2 rounded-full bg-orange-400 text-gray-200 font-bold cursor-pointer hover:bg-green-800 transition duration-300">
                         </form>
                         <span class="hover:text-orange-400 text-green-800 transition duration-300 pointer" onclick="toggleForms()">Sign In</span>
@@ -389,30 +392,25 @@ function toggleCreatePost() {
         createPost.classList.add('hidden');
     }
 }
-const form = document.querySelector('#postForm');
+const newPost = document.querySelector('#postForm');
 const formPanel = document.getElementById('postForm');
 const fileInput = document.querySelector('#post_file');
 const loadingElement = document.getElementById('createPostLoading');
 const panel = document.getElementById('createPost');
 
-form.addEventListener('submit', async (event) => {
+newPost.addEventListener('submit', async (event) => {
     event.preventDefault();
-
     loadingElement.classList.remove('hidden');
     panel.classList.add('pointer-events-none');
     formPanel.classList.add('hidden');
-
     const formData = new FormData(form);
-
     if (fileInput && fileInput.files.length > 0) {
         const file = fileInput.files[0];
-
         const options = {
             maxSizeMB: 1,
             maxWidthOrHeight: 1920,
             useWebWorker: true
         };
-
         try {
             const finalFile = await imageCompression(file, options);
             formData.set('post_file', finalFile, file.name);
@@ -427,26 +425,21 @@ form.addEventListener('submit', async (event) => {
             return; 
         }
     }
-
     try {
         const response = await fetch('/create-post', {
             method: 'POST',
             body: formData,
-            // Add this header so Laravel knows it's an AJAX request
             headers: {
                 'Accept': 'application/json'
             }
         });
-
         if (!response.ok) {
             const errorData = await response.json();
             console.error("Server validation failed:", errorData);
             alert("Upload failed. Check console for details.");
             throw new Error("Server rejected the request");
         }
-
         window.location.reload();
-
     } catch (err) {
         console.error(err);
         loadingElement.classList.add('hidden');
