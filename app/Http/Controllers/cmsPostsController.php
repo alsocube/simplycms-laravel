@@ -34,7 +34,7 @@ class cmsPostsController extends Controller
             $validator = Validator::make($request->all(), [
                 'display_name' => 'required|string|max:25',
                 'post_title' => 'required|string|max:255',
-                'post_file' => 'nullable|image|max:4096' // 4MB safe for serverless
+                'post_file' => 'nullable|image|max:4096' 
             ], [
                 'display_name.required' => 'Display Name is required',
                 'display_name.max' => 'Display Name must be less than 25 characters',
@@ -45,42 +45,49 @@ class cmsPostsController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return redirect('/')
-                    ->withErrors($validator)
-                    ->withInput();
-            } else {
-                $post = new cmsPostsModel();
-                $post->user_id = Auth::check() ? Auth::id() : 1999;
-                $post->display_name = $request->input('display_name');
-                $post->title = $request->input('post_title');
-                $post->contents = $request->input('post_contents');
-
-                if ($request->hasFile('post_file')) {
-                    $file = $request->file('post_file');
-
-                    $path = $file->storeAs(
-                        'posts',
-                        Str::random(40) . '.' . $file->extension(),
-                        'r2'
-                    );
-
-                    $post->file_name = $path;
-                    $post->file_path = Storage::disk('r2')->url($path);
+                // Return JSON errors for fetch requests
+                if ($request->wantsJson()) {
+                    return response()->json(['errors' => $validator->errors()], 422);
                 }
+                return redirect('/')->withErrors($validator)->withInput();
+            } 
+            
+            $post = new cmsPostsModel();
+            $post->user_id = Auth::check() ? Auth::id() : 1999;
+            $post->display_name = $request->input('display_name');
+            $post->title = $request->input('post_title');
+            $post->contents = $request->input('post_contents');
 
-                $post->save();
-                return redirect('/')
-                    ->with('success', 'Post Created');
+            if ($request->hasFile('post_file')) {
+                $file = $request->file('post_file');
+
+                $path = $file->storeAs(
+                    'posts',
+                    Str::random(40) . '.' . $file->extension(),
+                    'r2'
+                );
+
+                $post->file_name = $path;
+                $post->file_path = Storage::disk('r2')->url($path);
             }
+
+            $post->save();
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Post Created']);
+            }
+            
+            return redirect('/')->with('success', 'Post Created');
+            
         } catch (\Throwable $e) {
             return response()->json([
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
-            ]);
+            ], 500);
         }
     }
-
+    
     public function deletePost(Request $request)
     {
         $post = cmsPostsModel::where('post_id', $request->input('id'))->first();

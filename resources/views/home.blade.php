@@ -131,6 +131,10 @@
                     <div id="createPostHeader">
                         <h3 class="text-2xl font-bold text-gray-800">Create New Post</h3>
                     </div>
+                    <div id="createPostLoading" class="flex flex-col items-center gap-3 p-5 hidden">
+                        <div class="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-gray-700 font-semibold">Creating Post...</span>
+                    </div>
                     <form id="postForm" method="POST" action="/create-post" enctype="multipart/form-data">
                         @csrf
                         @if (Auth::check())
@@ -148,10 +152,6 @@
                         <input id="post_file" type="file" name="post_file" class="w-full p-2 rounded-sm bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 mb-4">
                         <input type="submit" value="Create Post" class="w-full p-2 rounded-full bg-orange-400 text-gray-200 font-bold cursor-pointer hover:bg-green-800 transition duration-300">
                     </form>
-                    <div id="createPostLoading" class="flex flex-col items-center gap-3 hidden">
-                        <div class="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span class="text-gray-700 font-semibold">Creating Post...</span>
-                    </div>
                 </div>
             </div>
             <!-- alt profile panel -->
@@ -390,6 +390,7 @@ function toggleCreatePost() {
     }
 }
 const form = document.querySelector('#postForm');
+const formPanel = document.getElementById('postForm');
 const fileInput = document.querySelector('#post_file');
 const loadingElement = document.getElementById('createPostLoading');
 const panel = document.getElementById('createPost');
@@ -397,11 +398,11 @@ const panel = document.getElementById('createPost');
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    // show blur overlay
     loadingElement.classList.remove('hidden');
     panel.classList.add('pointer-events-none');
+    formPanel.classList.add('hidden');
 
-    let finalFile = null;
+    const formData = new FormData(form);
 
     if (fileInput && fileInput.files.length > 0) {
         const file = fileInput.files[0];
@@ -413,31 +414,43 @@ form.addEventListener('submit', async (event) => {
         };
 
         try {
-            finalFile = await imageCompression(file, options);
+            const finalFile = await imageCompression(file, options);
+            formData.set('post_file', finalFile, file.name);
         } catch (err) {
             console.error("Compression error:", err);
+            alert("Image compression failed. Please try a different image.");
+            
+            // Revert UI and STOP submission
+            loadingElement.classList.add('hidden');
+            formPanel.classList.remove('hidden');
+            panel.classList.remove('pointer-events-none');
+            return; 
         }
     }
 
-    const formData = new FormData(form);
-
-    if (finalFile) {
-        formData.set('post_file', finalFile);
-    }
-
     try {
-        await fetch('/create-post', {
+        const response = await fetch('/create-post', {
             method: 'POST',
-            body: formData
+            body: formData,
+            // Add this header so Laravel knows it's an AJAX request
+            headers: {
+                'Accept': 'application/json'
+            }
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Server validation failed:", errorData);
+            alert("Upload failed. Check console for details.");
+            throw new Error("Server rejected the request");
+        }
 
         window.location.reload();
 
     } catch (err) {
         console.error(err);
-
-        // restore UI if failed
         loadingElement.classList.add('hidden');
+        formPanel.classList.remove('hidden');
         panel.classList.remove('pointer-events-none');
     }
 });
