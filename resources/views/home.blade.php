@@ -100,6 +100,12 @@
             <!-- full post view panel -->
             <div class="hidden" id="fullPostView">
                 <div id="postLoading" class="rounded-3xl shadow-2xl p-8 flex flex-col justify-center d9d9d9 w-[100%] mx-auto">
+                    <div class="bg-orange-400 hover:bg-green-800 transition duration-300 rounded-full h-[35px] flex items-center justify-center p-2 cursor-pointer shadow-lg md-dark z-10" onclick="closePostView()">
+                        <div class="flex flex-row items-center justify-center">
+                            <span class="material-icons">arrow_back</span>
+                            <span>Close</span>
+                        </div>
+                    </div>
                     <div id="postLoading" class="text-center py-10 text-gray-600">Loading...</div>
                 </div>
                 <div id="postContentArea" class="hidden max-w-[666px] mx-auto flex flex-col justify-center items-center rounded-3xl shadow-2xl overflow-hidden bg-[#8c8c8c] relative">
