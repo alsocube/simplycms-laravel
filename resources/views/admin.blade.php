@@ -33,9 +33,6 @@
                 <button id="usersManagement" class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition" onclick="showUsers()">
                     User Management
                 </button>
-                <!-- <button id="r2Management" class="py-3 px-4 text-gray-400 hover:text-white hover:border-b-2 transition" onclick="showR2Usage()">
-                    R2 Usage
-                </button> -->
             </nav>
         </div>
         <!-- table content -->
@@ -97,12 +94,6 @@ function showPosts(offset = 0) {
         usersManagement.classList.remove('text-orange-400');
         usersManagement.classList.add('text-gray-400');
     }
-
-    if (r2Management.classList.contains('border-b-2')) {
-        r2Management.classList.remove('border-b-2');
-        r2Management.classList.remove('text-orange-400');
-        r2Management.classList.add('text-gray-400');
-    }
     
     postManagement.classList.add('border-b-2');
     postManagement.classList.add('text-orange-400');
@@ -120,14 +111,13 @@ function showPosts(offset = 0) {
     })
     .then(response => response.json())
     .then(data => {
-        if (!table.classList.contains('hidden')) {
-            table.classList.remove('hidden');
-        }
+        table.classList.remove('hidden');
         loading.classList.add('hidden');
         pagination.classList.remove('hidden');
         indexControl.classList.remove('hidden');
         pageIndex.classList.remove('hidden');
         
+        // Explicitly parse the offset as an integer just to be extra safe
         const currentOffset = parseInt(data.offset, 10);
         const currentPage = Math.floor(currentOffset / limit) + 1;
         
@@ -142,7 +132,7 @@ function showPosts(offset = 0) {
                     onclick="showPosts(${Math.max(0, currentOffset - limit)})">Previous</button>
                     
                 <button class="px-3 py-1 bg-gray-700 rounded hover:bg-orange-400 disabled:opacity-50" 
-                    ${data.posts.length < limit ? 'disabled' : ''} 
+                    ${data.posts.length < limit || data.posts.length === 5 ? 'disabled' : ''} 
                     onclick="showPosts(${currentOffset + limit})">Next</button>
             </div>
         `;
@@ -208,12 +198,6 @@ function showUsers(offset = 0) {
         postManagement.classList.add('text-gray-400');
     }
 
-    if (r2Management.classList.contains('border-b-2')) {
-        r2Management.classList.remove('border-b-2');
-        r2Management.classList.remove('text-orange-400');
-        r2Management.classList.add('text-gray-400');
-    }
-
     usersManagement.classList.add('border-b-2');
     usersManagement.classList.add('text-orange-400');
     usersManagement.classList.remove('text-gray-400');
@@ -233,13 +217,11 @@ function showUsers(offset = 0) {
         pagination.classList.remove('hidden');
         indexControl.classList.remove('hidden');
         pageIndex.classList.remove('hidden');
-        if (!table.classList.contains('hidden')) {
-            table.classList.remove('hidden');
-        }
+        table.classList.remove('hidden');
         
         const currentOffset = parseInt(data.offset, 10);
         const currentPage = Math.floor(currentOffset / limit) + 1;
-
+        
         pageIndex.innerHTML = `
             <span class="text-gray-400">Showing page ${currentPage}</span>
         `;
@@ -262,7 +244,7 @@ function showUsers(offset = 0) {
                 <th class="p-4">User ID</th>
                 <th class="p-4">Username</th>
                 <th class="p-4">Email</th>
-                <th class="p-4">Post Count</th>
+                <th class="p-4">Remember Me Token</th>
                 <th class="p-4">Hashed Password</th>
                 <th class="p-4">Access</th>
                 <th class="p-4 text-center">Actions</th>
@@ -300,46 +282,6 @@ function showUsers(offset = 0) {
         console.error('Error:', error);
     });
 }
-
-// function showR2Usage() {
-//     if (typeof event !== 'undefined') {
-//         event.preventDefault();
-//     }
-
-//     table.classList.add('hidden');
-//     loading.classList.remove('hidden');
-//     pagination.classList.add('hidden');
-
-//     [postManagement, usersManagement].forEach(el => {
-//         el.classList.remove('border-b-2', 'text-orange-400');
-//         el.classList.add('text-gray-400');
-//     });
-
-//     r2Management.classList.add('border-b-2', 'text-orange-400');
-//     r2Management.classList.remove('text-gray-400');
-
-//     fetch(`{{ url('/r2-usage') }}`, {
-//         method: 'GET',
-//         headers: { 'Content-Type': 'application/json' }
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         loading.classList.add('hidden');
-//         tableHead.classList.remove('hidden');
-//         tableHead.innerHTML = `
-//             <tr class="bg-[#1d1d1d] text-gray-400 uppercase text-xs">
-//                 <th class="p-4">Payload</th>
-//                 <th class="p-4"></th>
-//             </tr>
-//         `;
-        
-//         tableBody.innerHTML = '';
-//     })
-//     .catch(error => {
-//         console.error('Error:', error);
-//         loading.classList.add('hidden');
-//     });
-// }
 function deletePost(postId) {
     if (!confirm('Are you sure you want to delete this post?')) return;
     const form = document.createElement('form');
