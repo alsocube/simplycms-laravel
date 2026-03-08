@@ -12,7 +12,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div class="bg-[#2d2d2d] p-6 rounded-2xl shadow-lg text-center">
             <h3 class="text-xl font-semibold">Total Posts</h3>
-            <p class="text-4xl font-bold mt-2 text-orange-400">{{ count($posts ?? []) }}</p>
+            <p id="totalPostsCount" class="text-4xl font-bold mt-2 text-orange-400">{{ count($posts ?? []) }}</p>
         </div>
         <div class="p-6 text-center">
             <h3 class="text-xl font-semibold">Hello There</h3>
@@ -20,7 +20,8 @@
         </div>
         <div class="bg-[#2d2d2d] p-6 rounded-2xl shadow-lg text-center">
             <h3 class="text-xl font-semibold">Storage Used (Cloudflare R2)</h3>
-            <p class="text-4xl font-bold mt-2 text-blue-400">{{ $storageSize }}</p>
+            <p class="text-4xl font-bold m-2 text-blue-400">{{ $storageSize }}</p>
+            <p class="text-sm font-semibold text-orange-400">{{ $end }}</p>
         </div>
     </div>
 
@@ -102,6 +103,8 @@ function showPosts(offset = 0) {
     
     // Always declare variables with const or let
     const limit = 5; 
+    const totalPostsElement = document.getElementById('totalPostsCount');
+    const totalPosts = totalPostsElement ? parseInt(totalPostsElement.innerText, 10) : null;
     
     fetch(`{{ url('/posts') }}?offset=${offset}`, {
         method: 'GET',
@@ -122,9 +125,9 @@ function showPosts(offset = 0) {
         const currentPage = Math.floor(currentOffset / limit) + 1;
         
         pageIndex.innerHTML = `
-            <span class="text-gray-400">Showing page ${currentPage}</span>
+            <span class="text-gray-400">Showing page ${currentPage} out of ${Math.ceil(totalPosts / limit)}</span>
         `;
-
+        const nextDisabled = data.posts.length < limit || (totalPosts !== null && (currentOffset + data.posts.length) >= totalPosts);
         indexControl.innerHTML = `
             <div class="flex gap-2">
                 <button class="px-3 py-1 bg-gray-700 rounded hover:bg-orange-400 disabled:opacity-50" 
@@ -132,7 +135,7 @@ function showPosts(offset = 0) {
                     onclick="showPosts(${Math.max(0, currentOffset - limit)})">Previous</button>
                     
                 <button class="px-3 py-1 bg-gray-700 rounded hover:bg-orange-400 disabled:opacity-50" 
-                    ${data.posts.length < limit || data.posts.length === 5 ? 'disabled' : ''} 
+                    ${nextDisabled ? 'disabled' : ''}
                     onclick="showPosts(${currentOffset + limit})">Next</button>
             </div>
         `;
