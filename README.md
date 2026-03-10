@@ -1,6 +1,7 @@
+<p align="center"><h1>SimplyCMS</h1></p>
 <p align="center">
-  <img src="https://simplycms.my.id/posts/Screenshot%202026-03-10%20164026.png" alt="website homecscreen" width="45%" />
-  <img src="https://simplycms.my.id/posts/Screenshot%202026-03-10%20164446.png" alt="website homecscreen" width="45%" />
+  <img src="https://simplycms.my.id/posts/Screenshot%202026-03-10%20164026.png" alt="website homecscreen" width="200px" />
+  <img src="https://simplycms.my.id/posts/Screenshot%202026-03-10%20164446.png" alt="website homecscreen" height="200px" />
 </p>
 
 ## About
