@@ -1,4 +1,7 @@
-<p align="center"><a href="" target="_blank"><img src="https://czvnfiithalbnojeucgz.supabase.co/storage/v1/object/public/preview/home.png" alt="website homecscreen"></a></p>
+<p align="center">
+  <img src="https://simplycms.my.id/posts/Screenshot%202026-03-10%20164026.png" alt="website homecscreen" width="45%" />
+  <img src="https://simplycms.my.id/posts/Screenshot%202026-03-10%20164446.png" alt="website homecscreen" width="45%" />
+</p>
 
 ## About
 
